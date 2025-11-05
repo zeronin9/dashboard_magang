@@ -2,12 +2,13 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { Input } from './ui/Input';
-import { Button } from './ui/Button';
 import { login } from '@/lib/auth';
 import { validateUsername, validatePassword } from '@/lib/utils';
 
-export function LoginForm() {
+export function LoginForm({
+  className,
+  ...props
+}: React.ComponentProps<"div">) {
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -44,7 +45,6 @@ export function LoginForm() {
       const response = await login({ username, password });
       
       if (response.success) {
-        // Redirect ke dashboard
         router.push('/dashboard');
         router.refresh();
       } else {
@@ -59,99 +59,141 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {apiError && (
-        <div className="p-4 rounded-lg bg-red-50 border border-red-200">
-          <div className="flex items-start gap-3">
-            <svg
-              className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-            <p className="text-sm text-red-700">{apiError}</p>
+    <div className={`flex flex-col gap-6  ${className || ''}`} {...props}>
+      <div className="overflow-hidden rounded-lg border bg-card text-card-foreground shadow-sm p-0 border-white" >
+        <div className="grid p-0 md:grid-cols-2 ">
+          <form className="p-6 md:p-8 " onSubmit={handleSubmit}>
+            <div className="space-y-6 ">
+              {/* Header */}
+              <div className="flex flex-col items-center gap-2 text-center ">
+                <h1 className="text-2xl font-bold">Welcome To Horeka Pos+</h1>
+                <p className="text-muted-foreground text-balance">
+                  POS app to simplify your business operations
+                </p>
+              </div>
+
+              {/* Error Alert */}
+              {apiError && (
+                <div className="p-4 rounded-lg bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-500/50">
+                  <div className="flex items-start gap-3">
+                    <svg
+                      className="w-5 h-5 text-red-600 dark:text-red-500 mt-0.5 flex-shrink-0"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                    <p className="text-sm text-red-700 dark:text-red-400">{apiError}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Email Field */}
+              <div className="space-y-2">
+                <label 
+                  htmlFor="email" 
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Username
+                </label>
+                <input
+                  id="username"
+                  type="username"
+                  placeholder="m@example.com"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  disabled={isLoading}
+                  className={`flex h-10 w-full rounded-md border ${
+                    errors.username ? 'border-red-500' : 'border-input'
+                  } bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50`}
+                />
+                {errors.username && (
+                  <p className="text-sm text-red-600 dark:text-red-400">{errors.username}</p>
+                )}
+              </div>
+
+              {/* Password Field */}
+              <div className="space-y-2">
+                <div className="flex items-center">
+                  <label 
+                    htmlFor="password"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Password
+                  </label>
+                </div>
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isLoading}
+                  className={`flex h-10 w-full rounded-md border ${
+                    errors.password ? 'border-red-500' : 'border-input'
+                  } bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50`}
+                />
+                {errors.password && (
+                  <p className="text-sm text-red-600 dark:text-red-400">{errors.password}</p>
+                )}
+              </div>
+
+              {/* Login Button */}
+              <div className="space-y-2">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full"
+                >
+                  {isLoading ? (
+                    <div className="flex items-center justify-center gap-2">
+                      <svg
+                        className="animate-spin h-4 w-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    'Login'
+                  )}
+                </button>
+              </div>
+            </div>
+          </form>
+
+          {/* Right side image */}
+          <div className="bg-muted relative hidden md:block">
+            <img
+              src="/placeholder.png"
+              alt="Login illustration"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
           </div>
         </div>
-      )}
-
-      <div className="p-4 rounded-lg bg-blue-50 border border-blue-200">
-        <p className="text-sm font-medium text-blue-900 mb-2">
-          🔐 Kredensial Admin Platform
-        </p>
-        <div className="space-y-1">
-          <p className="text-xs text-blue-700">
-            <span className="font-medium">Username:</span> admin_platform
-          </p>
-          <p className="text-xs text-blue-700">
-            <span className="font-medium">Password:</span> admin123
-          </p>
-        </div>
-        <p className="text-xs text-blue-600 mt-2 italic">
-          Role: Platform Super Admin (Level 3)
-        </p>
       </div>
-
-      <Input
-        label="Username"
-        type="text"
-        value={username}
-        onChange={(e) => setUsername(e.target.value)}
-        error={errors.username}
-        placeholder="admin_platform"
-        autoComplete="username"
-        disabled={isLoading}
-      />
-
-      <Input
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        error={errors.password}
-        placeholder="Masukkan password"
-        autoComplete="current-password"
-        disabled={isLoading}
-      />
-
-      <div className="flex items-center justify-between">
-        <label className="flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-            disabled={isLoading}
-          />
-          <span className="ml-2 text-sm text-gray-600">Ingat saya</span>
-        </label>
-        <a
-          href="#"
-          className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"
-        >
-          Lupa password?
-        </a>
-      </div>
-
-      <Button
-        type="submit"
-        variant="primary"
-        size="lg"
-        isLoading={isLoading}
-        className="w-full"
-      >
-        {isLoading ? 'Memproses...' : 'Masuk ke Dashboard'}
-      </Button>
-
-      <div className="text-center pt-2">
-        <p className="text-xs text-gray-500">
-          API Endpoint: {process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}
-        </p>
-      </div>
-    </form>
+    </div>
   );
 }
