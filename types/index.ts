@@ -1,3 +1,4 @@
+// Login & Auth Types
 export interface LoginCredentials {
   username: string;
   password: string;
@@ -16,13 +17,7 @@ export interface LoginResponse {
 
 export interface AuthResponse {
   success: boolean;
-  message?: string;
   user?: User;
   token?: string;
-}
-
-export interface ApiError {
-  error: string;
-  message: string;
-  statusCode?: number;
+  message?: string;
 }

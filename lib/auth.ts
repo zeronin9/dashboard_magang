@@ -15,9 +15,11 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
       success: true,
       user: response.user,
       token: response.token,
-      message: response.message
+      message: response.message || 'Login successful'
     };
   } catch (error) {
+    console.error('Login error:', error);
+    
     if (error instanceof ApiError) {
       return {
         success: false,
@@ -36,10 +38,12 @@ export function logout(): void {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    // Redirect ke login
+    window.location.href = '/login';
   }
 }
 
-export function getStoredUser() {
+export function getStoredUser(): User | null {
   if (typeof window !== 'undefined') {
     const userStr = localStorage.getItem('user');
     return userStr ? JSON.parse(userStr) : null;

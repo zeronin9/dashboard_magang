@@ -1,4 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+// ✅ CHANGED: Use Next.js API route instead of direct backend call
+const API_URL = '/api';
+
+console.log('🌐 Using API URL:', API_URL);
 
 interface RequestOptions extends RequestInit {
   token?: string;
@@ -20,22 +23,30 @@ async function request<T>(
 ): Promise<T> {
   const { token, ...fetchOptions } = options;
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...fetchOptions.headers,
+    ...(fetchOptions.headers as Record<string, string>),
   };
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
 
+  const url = `${API_URL}${endpoint}`;
+  
+  console.log('📡 Making request to:', url);
+  console.log('📤 Request options:', { method: fetchOptions.method, headers });
+  
   try {
-    const response = await fetch(`${API_URL}${endpoint}`, {
+    const response = await fetch(url, {
       ...fetchOptions,
       headers,
     });
 
+    console.log('📥 Response status:', response.status);
+
     const data = await response.json();
+    console.log('📦 Response data:', data);
 
     if (!response.ok) {
       throw new ApiError(
@@ -46,13 +57,21 @@ async function request<T>(
 
     return data;
   } catch (error) {
+    console.error('❌ Request error:', error);
+    
     if (error instanceof ApiError) {
       throw error;
     }
     
-    // Network error atau error lainnya
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new ApiError(
+        `Tidak dapat terhubung ke server. Pastikan backend berjalan.`,
+        0
+      );
+    }
+    
     throw new ApiError(
-      'Tidak dapat terhubung ke server. Periksa koneksi Anda.',
+      'Terjadi kesalahan: ' + (error as Error).message,
       0
     );
   }

@@ -2,12 +2,12 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
-  --primary: #2563eb;
+  --foreground: #1f2937;
+  --primary: #9333ea;
   --primary-foreground: #ffffff;
   --border: #e5e7eb;
-  --input: #f3f4f6;
-  --ring: #2563eb;
+  --input: #f9fafb;
+  --ring: #9333ea;
 }
 
 @theme inline {
@@ -24,8 +24,8 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #DCDCDC;
+    --foreground: #f3f4f6;
     --border: #374151;
     --input: #1f2937;
   }
@@ -39,4 +39,20 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+/* Smooth animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
 }
