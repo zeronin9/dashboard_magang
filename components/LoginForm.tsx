@@ -58,7 +58,7 @@ export function LoginForm({
 
   return (
     <div className={`flex flex-col gap-6 ${className || ''}`} {...props}>
-      <div className="overflow-hidden rounded-3xl bg-white shadow-2xl max-w-5xl mx-auto w-full">
+      <div className="overflow-hidden rounded-xl bg-white shadow-md max-w-5xl mx-auto w-full">
         <div className="grid md:grid-cols-2">
           {/* Left side - Login Form */}
           <div className="p-12 md:p-16 flex flex-col justify-center bg-white">
@@ -66,14 +66,14 @@ export function LoginForm({
             <div className="mb-8">
               <div className="flex items-center gap-2">
                 <img src="/logo-horeka.svg" alt="Horeka Logo" className="h-10 w-10 object-contain" />
-                <span className="text-xl font-bold text-gray-800">Horeka POS+</span>
+                <span className="text-xl font-bold text-blue-800">Horeka POS+</span>
               </div>
             </div>
 
             <div className="space-y-8">
               {/* Header */}
               <div>
-                <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-pink-500 mb-3 leading-relaxed">
+                <h1 className="text-4xl font-bold  bg-clip-text text-black mb-3 leading-relaxed">
                   Start Your Horeka
                 </h1>
 
@@ -122,7 +122,7 @@ export function LoginForm({
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
                     disabled={isLoading}
-                    className={`w-full pl-12 pr-4 py-4 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-700 placeholder-gray-400 ${
+                    className={`w-full pl-12 pr-4 py-4 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 transition-all disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-700 placeholder-gray-400 ${
                       errors.username ? 'ring-2 ring-red-500' : ''
                     }`}
                   />
@@ -146,7 +146,7 @@ export function LoginForm({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     disabled={isLoading}
-                    className={`w-full pl-12 pr-4 py-4 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-700 placeholder-gray-400 ${
+                    className={`w-full pl-12 pr-4 py-4 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-800 transition-all disabled:bg-gray-100 disabled:cursor-not-allowed text-gray-700 placeholder-gray-400 ${
                       errors.password ? 'ring-2 ring-red-500' : ''
                     }`}
                   />
@@ -159,7 +159,7 @@ export function LoginForm({
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-4 px-6 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white font-semibold rounded-full shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none mt-2"
+                  className="w-full py-4 px-6 bg-gradient-to-r from-blue-800 to-blue-800 hover:from-blue-800 hover:to-blue-800 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none mt-2"
                 >
                   {isLoading ? (
                     <div className="flex items-center justify-center gap-2">
@@ -192,27 +192,31 @@ export function LoginForm({
               </form>
             </div>
           </div>
-
-          {/* Right side - Decorative Panel with PURPLE Gradient */}
-          <div className="relative hidden md:flex items-center justify-center overflow-hidden bg-gradient-to-br from-purple-700 via-purple-600 to-purple-700 p-12">
-            {/* Decorative geometric shapes - Purple tones */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-purple-300/20 rounded-full blur-3xl transform translate-x-32 -translate-y-32"></div>
-            <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-400/30 rounded-full blur-3xl transform -translate-x-40 translate-y-40"></div>
-            <div className="absolute top-1/2 left-1/2 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl transform -translate-x-1/2 -translate-y-1/2"></div>
-            
-            {/* Content */}
+          {/* Right side - Image with Overlay */}
+          <div className="relative hidden md:flex items-center justify-center overflow-hidden p-12">
+          {/* Background Image */}
+            <img
+              src="/placeholder.png"
+              alt="Horeka POS Background"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+  
+          {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-900/80 via-blue-900/60 to-blue-900/80"></div>
+  
+          {/* Content */}
             <div className="relative z-10 text-center text-white space-y-8">
               <div className="space-y-4">
-                <h2 className="text-5xl font-bold">
+                <h2 className="text-5xl font-bold bg-clip-text text-white drop-shadow-md">
                   Welcome to Horeka POS+
                 </h2>
-                <p className="text-white/90 text-lg max-w-sm mx-auto leading-relaxed">
-                  POS app to simplify your business operations
-                </p>
-              </div>
-
+              <p className="text-white/90 text-base max-w-sm mx-auto leading-relaxed drop-shadow-md">
+                POS app to simplify your business operations
+              </p>
             </div>
           </div>
+        </div>
+
         </div>
       </div>
     </div>
