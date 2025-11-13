@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { API_CONFIG } from '@/lib/config';  // ← IMPORT
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,7 +8,8 @@ export async function POST(request: NextRequest) {
     console.log('🔄 Proxying login request to backend...');
     console.log('📤 Request body:', body);
     
-    const response = await fetch('http://192.168.1.19:3001/api/auth/login', {
+    // ✅ GUNAKAN API_CONFIG
+    const response = await fetch(`${API_CONFIG.BACKEND_URL}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

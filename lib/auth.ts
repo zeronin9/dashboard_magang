@@ -1,4 +1,4 @@
-import { LoginCredentials, AuthResponse, LoginResponse } from '@/types';
+import { LoginCredentials, AuthResponse, LoginResponse, User } from '@/types';  // ← TAMBAH User
 import { api, ApiError } from './api';
 
 export async function login(credentials: LoginCredentials): Promise<AuthResponse> {

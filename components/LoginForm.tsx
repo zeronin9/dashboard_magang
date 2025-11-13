@@ -58,7 +58,7 @@ export function LoginForm({
 
   return (
     <div className={`flex flex-col gap-6 ${className || ''}`} {...props}>
-      <div className="overflow-hidden rounded-xl bg-white shadow-md max-w-5xl mx-auto w-full">
+      <div className="overflow-hidden border border-gray-300 rounded-xl bg-white shadow-md max-w-5xl mx-auto w-full">
         <div className="grid md:grid-cols-2">
           {/* Left side - Login Form */}
           <div className="p-12 md:p-16 flex flex-col justify-center bg-white">

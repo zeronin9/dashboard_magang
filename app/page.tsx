@@ -10,7 +10,7 @@ export default function Home() {
   useEffect(() => {
     // Redirect based on authentication status
     if (isAuthenticated()) {
-      router.push('/dashboard_horeka');
+      router.push('/dashboard');  // ← FIXED: dari /dashboard_horeka jadi /dashboard
     } else {
       router.push('/login');
     }

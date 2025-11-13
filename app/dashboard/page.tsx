@@ -2,184 +2,227 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { getStoredUser, logout, isAuthenticated } from '@/lib/auth';
-import { User } from '@/types';
-import { Button } from '@/components/ui/Button';
+import { getStoredToken } from '@/lib/auth';
+import { Sidebar } from '@/components/ui/Sidebar';
+import { StatCard } from '@/components/ui/StatCard';
+import { PartnersTable } from '@/components/ui/PartnersTable';
+import { SubscriptionPlans } from '@/components/ui/SubscriptionPlans';
+import { 
+  Users, 
+  CheckCircle, 
+  Package,
+  Menu,
+  AlertCircle
+} from 'lucide-react';
+
+interface Partner {
+  partner_id: string;
+  business_name: string;
+  business_email: string;
+  business_phone: string;
+  status: string;
+  joined_date: string;
+}
+
+interface SubscriptionPlan {
+  plan_id: string;
+  plan_name: string;
+  price: string;
+  branch_limit: number;
+  device_limit: number;
+  description: string;
+}
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [stats, setStats] = useState({
+    totalPartners: 0,
+    activePartners: 0,
+    totalPlans: 0,
+  });
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check authentication
-    if (!isAuthenticated()) {
+    const token = getStoredToken();
+    
+    if (!token) {
       router.push('/login');
       return;
     }
 
-    // Get user data
-    const userData = getStoredUser();
-    setUser(userData);
-    setIsLoading(false);
+    fetchDashboardData(token);
   }, [router]);
 
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
+  const fetchDashboardData = async (token: string) => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      console.log('🔵 Fetching dashboard data...');
+
+      // Fetch Partners
+      const partnersRes = await fetch('/api/partner', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      console.log('📥 Partners response status:', partnersRes.status);
+
+      if (partnersRes.ok) {
+        const partnersData = await partnersRes.json();
+        console.log('✅ Partners data:', partnersData);
+        setPartners(partnersData);
+        
+        const activeCount = partnersData.filter((p: Partner) => p.status === 'Active').length;
+        setStats(prev => ({
+          ...prev,
+          totalPartners: partnersData.length,
+          activePartners: activeCount,
+        }));
+      } else {
+        const errorData = await partnersRes.json();
+        console.error('❌ Partners fetch failed:', errorData);
+        throw new Error(errorData.message || 'Failed to fetch partners');
+      }
+
+      // Fetch Subscription Plans
+      const plansRes = await fetch('/api/subscription-plan', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      console.log('📥 Plans response status:', plansRes.status);
+
+      if (plansRes.ok) {
+        const plansData = await plansRes.json();
+        console.log('✅ Plans data:', plansData);
+        setPlans(plansData);
+        setStats(prev => ({
+          ...prev,
+          totalPlans: plansData.length,
+        }));
+      } else {
+        const errorData = await plansRes.json();
+        console.error('❌ Plans fetch failed:', errorData);
+      }
+
+    } catch (error) {
+      console.error('❌ Error fetching dashboard data:', error);
+      setError(error instanceof Error ? error.message : 'Failed to load dashboard data');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600 font-medium">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md">
+          <div className="mb-4 inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100">
+            <AlertCircle className="w-8 h-8 text-red-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Failed to Load Dashboard</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="space-y-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => router.push('/login')}
+              className="w-full px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Back to Login
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-                <img
-                  src="/logo-horeka.svg"
-                  alt="Horeka Logo"
-                  className="w-10 h-10"
-                />
-              <h1 className="text-2xl font-bold text-gray-900">
-                Dashboard Horeka
-              </h1>
-            </div>
-            <Button onClick={handleLogout} variant="outline" size="sm">
-              Logout
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Card */}
-        <div className="bg-blue-800 rounded-xl shadow-lg p-8 text-white mb-8">
-          <h2 className="text-3xl font-bold mb-2">
-            Selamat Datang, {user?.name}! 👋
-          </h2>
-          <p className="text-blue-100">
-            Role: {user?.role}
-          </p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Total Users</p>
-                <h3 className="text-3xl font-bold text-gray-900">1,234</h3>
-              </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-blue-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <p className="text-xs text-green-600 mt-2">↑ 12% from last month</p>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Revenue</p>
-                <h3 className="text-3xl font-bold text-gray-900">$45.2K</h3>
-              </div>
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-green-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <p className="text-xs text-green-600 mt-2">↑ 8% from last month</p>
-          </div>
-
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Active Sessions</p>
-                <h3 className="text-3xl font-bold text-gray-900">89</h3>
-              </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <svg
-                  className="w-6 h-6 text-purple-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                  />
-                </svg>
-              </div>
-            </div>
-            <p className="text-xs text-red-600 mt-2">↓ 3% from last month</p>
+      <div className={`transition-all duration-300 ${isSidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
+        <div className="lg:hidden bg-white border-b border-gray-200 sticky top-0 z-30">
+          <div className="px-4 h-16 flex items-center">
+            <button
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+              className="p-2 rounded-lg hover:bg-gray-100"
+            >
+              <Menu className="w-6 h-6 text-gray-600" />
+            </button>
+            <h1 className="ml-4 text-lg font-semibold text-gray-900">Dashboard</h1>
           </div>
         </div>
 
-        {/* Recent Activity */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">
-            Recent Activity
-          </h3>
-          <div className="space-y-4">
-            {[1, 2, 3, 4].map((item) => (
-              <div
-                key={item}
-                className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg"
-              >
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="text-blue-600 font-semibold">{item}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">
-                    Activity Item {item}
-                  </p>
-                  <p className="text-xs text-gray-600">
-                    {item} minutes ago
-                  </p>
-                </div>
-                <Button variant="outline" size="sm">
-                  View
-                </Button>
-              </div>
-            ))}
+        <main className="p-4 sm:p-6 lg:p-8">
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900">
+              Dashboard Overview
+            </h2>
+            <p className="text-gray-600 mt-1">
+              Monitor your platform performance and manage partners
+            </p>
           </div>
-        </div>
-      </main>
+
+          {/* Stats Grid - ONLY 3 CARDS */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+            <StatCard
+              title="Total Partners"
+              value={stats.totalPartners}
+              description="Registered partners"
+              trend={{ value: "+12.5%", isPositive: true }}
+              icon={Users}
+              iconColor="text-blue-600"
+            />
+            
+            <StatCard
+              title="Active Partners"
+              value={stats.activePartners}
+              description="Active subscriptions"
+              trend={{ value: "+8.3%", isPositive: true }}
+              icon={CheckCircle}
+              iconColor="text-green-600"
+            />
+            
+            <StatCard
+              title="Plans Available"
+              value={stats.totalPlans}
+              description="Subscription packages"
+              icon={Package}
+              iconColor="text-purple-600"
+            />
+          </div>
+
+          <div className="mb-8">
+            <SubscriptionPlans plans={plans} />
+          </div>
+
+          {/* Partners Table */}
+<PartnersTable 
+  partners={partners} 
+  onRefresh={() => fetchDashboardData(getStoredToken()!)}
+/>
+
+        </main>
+      </div>
     </div>
   );
 }
