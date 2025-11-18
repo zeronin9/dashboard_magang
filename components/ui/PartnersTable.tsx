@@ -46,6 +46,7 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
   return (
     <>
       <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <div>
@@ -64,6 +65,7 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
           </div>
         </div>
         
+        {/* Table */}
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
@@ -98,10 +100,11 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
               ) : (
                 partners.map((partner) => (
                   <tr key={partner.partner_id} className="hover:bg-gray-50 transition-colors">
+                    {/* Business Name */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
-                          {partner.business_name.charAt(0)}
+                          {partner.business_name.charAt(0).toUpperCase()}
                         </div>
                         <div>
                           <div className="font-medium text-gray-900">{partner.business_name}</div>
@@ -109,11 +112,13 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
                         </div>
                       </div>
                     </td>
+
+                    {/* Contact */}
                     <td className="px-6 py-4">
                       <div className="space-y-1">
                         <div className="flex items-center gap-2 text-sm text-gray-700">
                           <Mail className="w-4 h-4 text-gray-400" />
-                          {partner.business_email}
+                          <span className="truncate">{partner.business_email}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-gray-700">
                           <Phone className="w-4 h-4 text-gray-400" />
@@ -121,6 +126,8 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
                         </div>
                       </div>
                     </td>
+
+                    {/* Status */}
                     <td className="px-6 py-4">
                       <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
                         partner.status === 'Active' 
@@ -133,6 +140,8 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
                         {partner.status}
                       </span>
                     </td>
+
+                    {/* Joined Date */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-sm text-gray-700">
                         <Calendar className="w-4 h-4 text-gray-400" />
@@ -143,6 +152,8 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
                         })}
                       </div>
                     </td>
+
+                    {/* Actions */}
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
                         <button
@@ -155,7 +166,7 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
                         <button
                           onClick={() => handleDelete(partner)}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="Delete partner"
+                          title="Suspend partner"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -168,22 +179,24 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
           </table>
         </div>
         
+        {/* Footer */}
         {partners.length > 0 && (
-          <div className="p-4 border-t border-gray-200 flex items-center justify-between">
+          <div className="p-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
             <p className="text-sm text-gray-600">
-              Showing <span className="font-medium">{partners.length}</span> partners
+              Showing <span className="font-medium">{partners.length}</span> partner(s)
             </p>
           </div>
         )}
       </div>
 
-      {/* Modals */}
+      {/* Add Partner Modal */}
       <AddPartnerModal 
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSuccess={handleSuccess}
       />
 
+      {/* Edit Partner Modal */}
       <EditPartnerModal 
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
@@ -191,6 +204,7 @@ export function PartnersTable({ partners, onRefresh }: PartnersTableProps) {
         partner={selectedPartner}
       />
 
+      {/* Delete/Suspend Partner Modal */}
       <DeleteConfirmModal 
         isOpen={isDeleteModalOpen}
         onClose={() => setIsDeleteModalOpen(false)}

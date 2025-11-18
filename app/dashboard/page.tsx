@@ -160,6 +160,7 @@ export default function DashboardPage() {
       <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
       <div className={`transition-all duration-300 ${isSidebarOpen ? 'lg:ml-64' : 'lg:ml-20'}`}>
+        {/* Mobile Header */}
         <div className="lg:hidden bg-white border-b border-gray-200 sticky top-0 z-30">
           <div className="px-4 h-16 flex items-center">
             <button
@@ -173,6 +174,7 @@ export default function DashboardPage() {
         </div>
 
         <main className="p-4 sm:p-6 lg:p-8">
+          {/* Header */}
           <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-900">
               Dashboard Overview
@@ -182,8 +184,9 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          {/* Stats Grid - ONLY 3 CARDS */}
+          {/* Stats Grid - 3 Cards */}
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-8">
+            {/* Total Partners Card */}
             <StatCard
               title="Total Partners"
               value={stats.totalPartners}
@@ -193,6 +196,7 @@ export default function DashboardPage() {
               iconColor="text-blue-600"
             />
             
+            {/* Active Partners Card */}
             <StatCard
               title="Active Partners"
               value={stats.activePartners}
@@ -202,6 +206,7 @@ export default function DashboardPage() {
               iconColor="text-green-600"
             />
             
+            {/* Plans Available Card */}
             <StatCard
               title="Plans Available"
               value={stats.totalPlans}
@@ -211,16 +216,16 @@ export default function DashboardPage() {
             />
           </div>
 
+          {/* Subscription Plans Section */}
           <div className="mb-8">
             <SubscriptionPlans plans={plans} />
           </div>
 
           {/* Partners Table */}
-<PartnersTable 
-  partners={partners} 
-  onRefresh={() => fetchDashboardData(getStoredToken()!)}
-/>
-
+          <PartnersTable 
+            partners={partners} 
+            onRefresh={() => fetchDashboardData(getStoredToken()!)}
+          />
         </main>
       </div>
     </div>

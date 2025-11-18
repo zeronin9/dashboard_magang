@@ -1,58 +1,67 @@
-'use client';
-
 import { LucideIcon } from 'lucide-react';
+
+interface Trend {
+  value: string;
+  isPositive: boolean;
+}
 
 interface StatCardProps {
   title: string;
-  value: string | number;
+  value: number | string;
   description: string;
-  trend?: {
-    value: string;
-    isPositive: boolean;
-  };
+  trend?: Trend;
   icon: LucideIcon;
-  iconColor?: string;
+  iconColor: string; // e.g., "text-blue-600"
 }
 
-export function StatCard({ 
-  title, 
-  value, 
-  description, 
-  trend, 
+export function StatCard({
+  title,
+  value,
+  description,
+  trend,
   icon: Icon,
-  iconColor = 'text-blue-600'
+  iconColor,
 }: StatCardProps) {
+  // Map icon color to background color
+  const getBackgroundColor = (colorClass: string): string => {
+    const colorMap: { [key: string]: string } = {
+      'text-blue-600': 'bg-blue-100',
+      'text-green-600': 'bg-green-100',
+      'text-purple-600': 'bg-purple-100',
+      'text-yellow-600': 'bg-yellow-100',
+      'text-red-600': 'bg-red-100',
+      'text-orange-600': 'bg-orange-100',
+      'text-pink-600': 'bg-pink-100',
+      'text-indigo-600': 'bg-indigo-100',
+      'text-teal-600': 'bg-teal-100',
+      'text-cyan-600': 'bg-cyan-100',
+    };
+    return colorMap[colorClass] || 'bg-gray-100';
+  };
+
+  const bgColor = getBackgroundColor(iconColor);
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-      <div className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
-            <h3 className="text-3xl font-bold text-gray-900">{value}</h3>
+    <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-md transition-shadow">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <p className="text-sm text-gray-600 font-medium">{title}</p>
+          <div className="flex items-baseline gap-2 mt-2">
+            <p className="text-3xl font-bold text-gray-900">{value}</p>
+            {trend && (
+              <span
+                className={`text-xs font-semibold ${
+                  trend.isPositive ? 'text-green-600' : 'text-red-600'
+                }`}
+              >
+                {trend.isPositive ? '↑' : '↓'} {trend.value}
+              </span>
+            )}
           </div>
-          <div className={`p-3 rounded-lg bg-blue-50`}>
-            <Icon className={`w-6 h-6 ${iconColor}`} />
-          </div>
+          <p className="text-xs text-gray-500 mt-1">{description}</p>
         </div>
-        
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">{description}</p>
-          {trend && (
-            <div className={`flex items-center gap-1 text-sm font-semibold ${
-              trend.isPositive ? 'text-green-600' : 'text-red-600'
-            }`}>
-              <span>{trend.value}</span>
-              {trend.isPositive ? (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                </svg>
-              ) : (
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                </svg>
-              )}
-            </div>
-          )}
+        <div className={`w-14 h-14 rounded-lg flex items-center justify-center flex-shrink-0 ${bgColor}`}>
+          <Icon className={`w-7 h-7 ${iconColor}`} />
         </div>
       </div>
     </div>

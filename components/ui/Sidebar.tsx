@@ -27,8 +27,8 @@ const menuItems = [
   { icon: Users, label: 'Partners', href: '/dashboard/partners' },
   { icon: Package, label: 'Subscription Plans', href: '/dashboard/plans' },
   { icon: Key, label: 'Licenses', href: '/dashboard/licenses' },
-  { icon: CreditCard, label: 'Payments', href: '/dashboard/payments' },
-  { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
+  // { icon: CreditCard, label: 'Payments', href: '/dashboard/payments' },
+  // { icon: Settings, label: 'Settings', href: '/dashboard/settings' },
 ];
 
 export function Sidebar({ isOpen, setIsOpen }: SidebarProps) {

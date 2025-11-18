@@ -10,6 +10,7 @@ interface Partner {
   business_email: string;
   business_phone: string;
   status: string;
+  joined_date: string;
 }
 
 interface EditPartnerModalProps {
@@ -20,22 +21,29 @@ interface EditPartnerModalProps {
 }
 
 export function EditPartnerModal({ isOpen, onClose, onSuccess, partner }: EditPartnerModalProps) {
+  // V V V PERBAIKAN DI SINI V V V
   const [formData, setFormData] = useState({
     business_name: '',
     business_email: '',
     business_phone: '',
+    status: '', // <-- 1. TAMBAHKAN 'status' DI SINI
   });
+  // ^ ^ ^ PERBAIKAN DI SINI ^ ^ ^
+  
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
     if (partner && isOpen) {
+      // V V V PERBAIKAN DI SINI V V V
       setFormData({
         business_name: partner.business_name || '',
         business_email: partner.business_email || '',
         business_phone: partner.business_phone || '',
+        status: partner.status || '', // <-- 2. ISI 'status' DARI PARTNER
       });
+      // ^ ^ ^ PERBAIKAN DI SINI ^ ^ ^
       setError('');
       setSuccessMsg('');
     }
@@ -68,7 +76,7 @@ export function EditPartnerModal({ isOpen, onClose, onSuccess, partner }: EditPa
         throw new Error('No authentication token found. Please login again.');
       }
 
-      console.log('📤 Submitting form data:', formData);
+      console.log('📤 Submitting form data:', formData); // Ini sekarang akan menyertakan 'status'
       console.log('📤 Partner ID:', partner.partner_id);
 
       const response = await fetch(`/api/partner/${partner.partner_id}`, {
@@ -77,7 +85,7 @@ export function EditPartnerModal({ isOpen, onClose, onSuccess, partner }: EditPa
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData), // <-- 3. Kirim formData LENGKAP
       });
 
       console.log('📥 Response status:', response.status);
@@ -114,6 +122,7 @@ export function EditPartnerModal({ isOpen, onClose, onSuccess, partner }: EditPa
           business_name: '',
           business_email: '',
           business_phone: '',
+          status: '', // <-- 4. Reset 'status' juga
         });
       }, 1000);
 

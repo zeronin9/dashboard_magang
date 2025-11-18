@@ -8,6 +8,9 @@ interface Partner {
   partner_id: string;
   business_name: string;
   business_email: string;
+  business_phone: string;
+  status: string;
+  joined_date: string;
 }
 
 interface DeleteConfirmModalProps {
@@ -23,10 +26,7 @@ export function DeleteConfirmModal({ isOpen, onClose, onSuccess, partner }: Dele
   const [successMsg, setSuccessMsg] = useState('');
 
   const handleDelete = async () => {
-    if (!partner) {
-      setError('Partner data is missing');
-      return;
-    }
+    if (!partner) return;
 
     setIsLoading(true);
     setError('');
@@ -45,79 +45,57 @@ export function DeleteConfirmModal({ isOpen, onClose, onSuccess, partner }: Dele
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
       });
 
-      console.log('📥 Response status:', response.status);
-      console.log('📥 Response headers:', Object.fromEntries(response.headers.entries()));
+      console.log('📥 Fetch response status:', response.status);
 
-      let responseData;
-      const contentType = response.headers.get('content-type');
-      
-      if (contentType && contentType.includes('application/json')) {
-        responseData = await response.json();
-      } else {
-        const text = await response.text();
-        console.log('📦 Response text:', text);
-        responseData = { message: text || 'No response body' };
-      }
-
-      console.log('📦 Response data:', responseData);
+      const data = await response.json();
+      console.log('📦 Fetch response data:', data);
 
       if (!response.ok) {
-        const errorMessage = responseData.error || 
-                           responseData.message || 
-                           `Failed to suspend partner (Status: ${response.status})`;
+        const errorMessage = data.error || data.message || `Failed to suspend partner (Status: ${response.status})`;
         throw new Error(errorMessage);
       }
 
       console.log('✅ Partner suspended successfully');
       setSuccessMsg('Partner suspended successfully! Status changed to "Suspended".');
       
+      // Close modal after 1.5 second
       setTimeout(() => {
         onSuccess();
         onClose();
-        // Reset state
-        setError('');
-        setSuccessMsg('');
       }, 1500);
 
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to suspend partner. Please try again.';
+      const errorMessage = err instanceof Error ? err.message : 'Failed to suspend partner';
       console.error('❌ Delete error:', errorMessage);
-      console.error('❌ Full error:', err);
       setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleClose = () => {
-    if (!isLoading) {
-      setError('');
-      setSuccessMsg('');
-      onClose();
-    }
-  };
-
   if (!partner) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title="Suspend Partner">
+    <Modal isOpen={isOpen} onClose={onClose} title="Suspend Partner">
       <div className="space-y-4">
+        {/* Error Message */}
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
             <strong>Error:</strong> {error}
           </div>
         )}
 
+        {/* Success Message */}
         {successMsg && (
           <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-600">
             <strong>Success:</strong> {successMsg}
           </div>
         )}
 
+        {/* Content */}
         {!successMsg && (
           <div className="flex items-start gap-4">
             <div className="flex-shrink-0 w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
@@ -149,11 +127,12 @@ export function DeleteConfirmModal({ isOpen, onClose, onSuccess, partner }: Dele
           </div>
         )}
 
+        {/* Buttons */}
         {!successMsg && (
           <div className="flex gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
-              onClick={handleClose}
+              onClick={onClose}
               className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading}
             >
